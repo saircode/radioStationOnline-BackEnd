@@ -65,9 +65,23 @@ class CityStationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, CityStation $cityStation)
+    public function update($id , Request $request)
     {
-        //
+        $cityStation = CityStation::find($id);
+
+        if(!$cityStation) return response([
+            'status_code'=>404,
+            'message'=> 'Not found'
+        ] , 404);
+
+        $cityStation->update($request->all());
+
+        return response([
+            'status_code'=> 201,
+            'message'=> 'Successful registration',
+            'current_data'=> new CityStationResource($cityStation)
+        ] , 201);
+
     }
 
     /**
