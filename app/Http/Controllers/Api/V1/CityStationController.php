@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\CityStation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CityStationController extends Controller
 {
@@ -13,7 +14,8 @@ class CityStationController extends Controller
      */
     public function index()
     {
-        //
+        $citiesStations = CityStation::latest()->get();
+        return response($citiesStations , 201);
     }
 
     /**
@@ -21,7 +23,26 @@ class CityStationController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = Validator::make($request->all(), [
+            'name' => 'required|unique:city_stations|max:255',
+            'url_live_audio' => 'required|unique:city_stations|url',
+        ]);
+         
+
+        if ($validated->fails()) {
+            return response ( [
+                'status_code'=> 422,
+                'message'=> $validated->errors()
+            ] ,  422);
+        }
+
+        $cityStation=new CityStation($request->all());
+        $cityStation->save();
+
+        return response([
+            'status_code'=> 201,
+            'message'=> 'Successful registration'
+        ] , 201);
     }
 
     /**
