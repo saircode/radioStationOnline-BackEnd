@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CityStation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\V1\CityStationResource;
 
 class CityStationController extends Controller
 {
@@ -14,7 +15,7 @@ class CityStationController extends Controller
      */
     public function index()
     {
-        $citiesStations = CityStation::latest()->get();
+        $citiesStations = CityStationResource::collection(CityStation::latest()->get());
         return response($citiesStations , 201);
     }
 
@@ -48,9 +49,17 @@ class CityStationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(CityStation $cityStation)
+    public function show($id)
     {
-        //
+        $cityStation = CityStation::find($id);
+
+        if(!$cityStation) return response([
+            'status_code'=>404,
+            'message'=> 'Not found'
+        ] , 404);
+
+        $cityStation = new CityStationResource($cityStation);
+        return response( $cityStation , 200);
     }
 
     /**
